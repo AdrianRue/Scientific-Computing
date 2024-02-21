@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.special import erfc
+from matplotlib import animation
 
 class DiffusionSimulation:
     def __init__(self, D=1, dx=0.05, dt=0.0001, L=1):
@@ -81,6 +82,32 @@ class DiffusionSimulation:
         plt.tight_layout()
         plt.show()
 
+    def animate_concentration(self, frames=200, interval=20):
+        """Animate the 2D concentration as time progresses."""
+        fig, ax = plt.subplots(figsize=(6, 6))
+        ax.set_title('2D Concentration Over Time')
+        # Initialize the first frame of the animation
+        im = ax.imshow(self.Lattice, cmap='hot', extent=[0, self.L, 0, self.L], aspect='auto', animated=True)
+        fig.colorbar(im, ax=ax, label='Concentration')
+        ax.set_xlabel('x')
+        ax.set_ylabel('y')
+        
+        # Function to reset the plot to its initial state; not strictly needed here since the plot updates directly
+        def init():
+            im.set_data(self.Lattice)
+            return im,
+        
+        # Update function for animation, this changes for each frame
+        def update(frame):
+            self.simulate_to_time(frame * self.dt)  # Run simulation up to the current frame
+            im.set_data(np.flipud(self.Lattice.T))  # Update the plot data
+            return im,
+        
+        # Create the animation
+        ani = animation.FuncAnimation(fig, update, frames=frames, init_func=init, blit=True, interval=interval)
+        
+        plt.show()
+
 # Parameters and usage
 D = 1
 dx = 0.05
@@ -88,5 +115,6 @@ dt = 0.0001
 time_points = [0.001, 0.01, 0.1, 1]
 
 simulation = DiffusionSimulation(D=D, dx=dx, dt=dt)
-simulation.compare_with_analytical(time_points)
-simulation.visualize_2d_concentration(time_points)
+# simulation.compare_with_analytical(time_points)
+# simulation.visualize_2d_concentration(time_points)
+simulation.animate_concentration(frames=2000, interval=1)
