@@ -8,13 +8,12 @@ class DiffusionSolver:
         self.setup_boundary_conditions()
 
     def setup_boundary_conditions(self):
-        # Adjust boundary conditions as required
         self.grid[0, :] = 1  # Top boundary set to 1
-        self.grid[-1, :] = 0   # Right boundary
+        self.grid[-1, :] = 0   
 
     def update_with_periodic_conditions(self, new_grid):
         # Apply periodic boundary conditions in the x-direction
-        new_grid[:, 0] = new_grid[:, -2]  # Left edge equals to the second to last column
+        new_grid[:, 0] = new_grid[:, -2]  
         new_grid[:, -1] = new_grid[:, 1]
 
     def jacobi_solve(self, epsilon=1e-5):
@@ -81,7 +80,7 @@ solver.gauss_seidel_solve()
 solver.plot_solution()
 
 solver = DiffusionSolver(N)  # Reset for SOR
-omega = 1.8  # Example omega value, adjust based on experimentation
+omega = 1.8  
 print("Solving with SOR, omega =", omega)
 solver.sor_solve(omega)
 solver.plot_solution()
