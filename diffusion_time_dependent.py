@@ -4,18 +4,18 @@ from scipy.special import erfc
 from matplotlib import animation
 
 class DiffusionSimulation:
-    def __init__(self, D=1, dx=0.05, dt=0.0001, L=1):
+    def __init__(self, D=1, L=1, N=50, dt=0.0001):
         self.D = D  # Diffusion coefficient
-        self.dx = dx  # Spatial step size
-        self.dt = dt  # Time step size
-        self.L = L  # Domain length
+        self.L = L
+        self.N = N
+        self.dx = L / N  # Spatial step size
+        self.dt = (self.dx**2) / (4 * D)  # Time step size
         self.initialize_lattice()  # Initialize lattice with boundary conditions
 
     def initialize_lattice(self):
         """Initialize or reset the lattice to the initial condition."""
-        self.N = int(round(self.L / self.dx))  
-        self.Lattice = np.zeros((self.N, self.N)) 
-        self.Lattice[:, self.N - 1] = 1  
+        self.Lattice = np.zeros((self.N, self.N))  # Initialize lattice
+        self.Lattice[:, self.N - 1] = 1
     
     def analytical_solution(self, y, t, terms=50):
         """Calculate the analytical solution for the concentration."""
@@ -73,7 +73,7 @@ class DiffusionSimulation:
         for i, t in enumerate(time_points):
             self.simulate_to_time(t)
             ax = axs[i] if len(time_points) > 1 else axs
-            im = ax.imshow(np.flipud(self.Lattice.T), cmap='hot', extent=[0, 1, 1, 0], aspect='auto')
+            im = ax.imshow(np.flipud(self.Lattice.T), cmap='hot', extent=[0, 1, 0, 1], aspect='auto')
             ax.set_title(f't={t}')
             ax.set_xlabel('x')
             ax.set_ylabel('y')
@@ -110,11 +110,11 @@ class DiffusionSimulation:
 
 # Parameters and usage
 D = 1
-dx = 0.05
+N = 50
 dt = 0.0001
 time_points = [0.001, 0.01, 0.1, 1]
 
-simulation = DiffusionSimulation(D=D, dx=dx, dt=dt)
+simulation = DiffusionSimulation(D=D, N=N, dt=dt)
 # simulation.compare_with_analytical(time_points)
 # simulation.visualize_2d_concentration(time_points)
 simulation.animate_concentration(frames=2000, interval=1)
