@@ -117,4 +117,4 @@ time_points = [0.001, 0.01, 0.1, 1]
 simulation = DiffusionSimulation(D=D, N=N, dt=dt)
 # simulation.compare_with_analytical(time_points)
 # simulation.visualize_2d_concentration(time_points)
-simulation.animate_concentration(frames=2000, interval=1)
+# simulation.animate_concentration(frames=2000, interval=1)
