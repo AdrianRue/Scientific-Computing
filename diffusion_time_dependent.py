@@ -2,19 +2,20 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.special import erfc
 from matplotlib import animation
+from matplotlib.animation import FuncAnimation, FFMpegWriter
 
 class DiffusionSimulation:
     def __init__(self, D=1, L=1, N=50, dt=0.0001):
-        self.D = D  # Diffusion coefficient
+        self.D = D  
         self.L = L
         self.N = N
-        self.dx = L / N  # Spatial step size
-        self.dt = (self.dx**2) / (4 * D)  # Time step size
-        self.initialize_lattice()  # Initialize lattice with boundary conditions
+        self.dx = L / N  
+        self.dt = (self.dx**2) / (4 * D)  
+        self.initialize_lattice() 
 
     def initialize_lattice(self):
         """Initialize or reset the lattice to the initial condition."""
-        self.Lattice = np.zeros((self.N, self.N))  # Initialize lattice
+        self.Lattice = np.zeros((self.N, self.N))  
         self.Lattice[:, self.N - 1] = 1
     
     def analytical_solution(self, y, t, terms=50):
@@ -67,45 +68,42 @@ class DiffusionSimulation:
         plt.show()
 
     def visualize_2d_concentration(self, time_points):
-        """Visualize the 2D concentration domain at multiple time points."""
-        fig, axs = plt.subplots(1, len(time_points), figsize=(15, 5))
-        
-        for i, t in enumerate(time_points):
+        """Visualize the 2D concentration domain at multiple time points, each in a separate plot."""
+        for t in time_points:
             self.simulate_to_time(t)
-            ax = axs[i] if len(time_points) > 1 else axs
-            im = ax.imshow(np.flipud(self.Lattice.T), cmap='hot', extent=[0, 1, 0, 1], aspect='auto')
-            ax.set_title(f't={t}')
+            fig, ax = plt.subplots(figsize=(6, 6))  # Create a new figure for each time point with square aspect ratio
+            
+            im = ax.imshow(np.flipud(self.Lattice.T), cmap='hot', extent=[0, 1, 0, 1], aspect='equal')  # Ensure square grid by setting aspect='equal'
+            ax.set_title(f'Concentration at t={t}')
             ax.set_xlabel('x')
             ax.set_ylabel('y')
-            fig.colorbar(im, ax=ax)
-        
-        plt.tight_layout()
-        plt.show()
+            fig.colorbar(im, ax=ax, fraction=0.046, pad=0.04)  # Add a colorbar to the plot
+            
+            plt.show()
 
-    def animate_concentration(self, frames=200, interval=20):
+    def animate_concentration(self, frames=200, interval=20, save_path=None):
         """Animate the 2D concentration as time progresses."""
         fig, ax = plt.subplots(figsize=(6, 6))
         ax.set_title('2D Concentration Over Time')
-        # Initialize the first frame of the animation
-        im = ax.imshow(self.Lattice, cmap='hot', extent=[0, self.L, 0, self.L], aspect='auto', animated=True)
+        im = ax.imshow(self.Lattice, cmap='hot', extent=[0, self.L, 0, self.L], aspect='equal', animated=True)
         fig.colorbar(im, ax=ax, label='Concentration')
         ax.set_xlabel('x')
         ax.set_ylabel('y')
-        
-        # Function to reset the plot to its initial state; not strictly needed here since the plot updates directly
+
         def init():
             im.set_data(self.Lattice)
-            return im,
-        
-        # Update function for animation, this changes for each frame
+            return (im,)
+
         def update(frame):
-            self.simulate_to_time(frame * self.dt)  # Run simulation up to the current frame
-            im.set_data(np.flipud(self.Lattice.T))  # Update the plot data
-            return im,
-        
-        # Create the animation
-        ani = animation.FuncAnimation(fig, update, frames=frames, init_func=init, blit=True, interval=interval)
-        
+            self.simulate_to_time(frame * (self.dt*10))
+            im.set_data(np.flipud(self.Lattice.T))
+            return (im,)
+
+        ani = FuncAnimation(fig, update, frames=frames, init_func=init, blit=True, interval=interval)
+        if save_path:
+            # Specify the writer for MP4 format
+            writer = FFMpegWriter(fps=30)  # Adjust fps as needed
+            ani.save(save_path, writer=writer)  # Save the animation as an MP4 file
         plt.show()
 
 # Parameters and usage
@@ -117,4 +115,4 @@ time_points = [0.001, 0.01, 0.1, 1]
 simulation = DiffusionSimulation(D=D, N=N, dt=dt)
 # simulation.compare_with_analytical(time_points)
 # simulation.visualize_2d_concentration(time_points)
-# simulation.animate_concentration(frames=2000, interval=1)
+# simulation.animate_concentration(frames=1000, interval=10, save_path='diffusion_animation1.mp4')
