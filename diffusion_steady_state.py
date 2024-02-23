@@ -67,7 +67,7 @@ class DiffusionSolver:
             self.delta_history = delta_history
         print(f"Gauss-Seidel method converged in {iteration_count} iterations.")
 
-    def sor_solve(self, omega, epsilon=1e-5, track_delta=False):
+    def sor_solve(self, omega, epsilon=1e-5, max_iterations=1000, track_delta=False, testing_mode=False):
         iteration_count = 0
         delta_history = []
         while True:
@@ -86,10 +86,14 @@ class DiffusionSolver:
                 delta_history.append(max_change)
             if max_change < epsilon:
                 break
+            if testing_mode and iteration_count >= max_iterations:
+                if track_delta:
+                    self.delta_history = delta_history
+                return iteration_count, False
         if track_delta:
             self.delta_history = delta_history
-        print(f"SOR method converged in {iteration_count} iterations.")
-
+        # print(f"SOR method converged in {iteration_count} iterations.")
+        return iteration_count, True
 
     def generate_analytical_solution(self):
         y = np.linspace(1, 0, self.N)  # Linear array from 0 to 1
@@ -123,7 +127,7 @@ class DiffusionSolver:
         plt.show()
 
 # Example usage
-N = 40
+N = 20
 solver = DiffusionSolver(N)
 
 # print("Solving with Jacobi...")
@@ -140,7 +144,7 @@ solver = DiffusionSolver(N)
 # print(f"RMSE Gauss-Seidel: {gauss_seidel_rmse}")
 
 # solver = DiffusionSolver(N)  # Reset for SOR
-# omega = 1.92  
+# omega = 1.7
 # print("Solving with SOR, omega =", omega)
 # solver.sor_solve(omega)
 # sor_solution = np.copy(solver.grid)

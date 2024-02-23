@@ -42,7 +42,7 @@ def animate(t):
 
 ani = animation.FuncAnimation(fig, animate, frames=time_steps, init_func=init, interval=5, blit=True)
 
-plt.show()
+# plt.show()
 
-ani.save('wave_propagation_initial_3_pi.mp4', writer='ffmpeg', fps=60)
+# ani.save('wave_propagation_initial_3_pi.mp4', writer='ffmpeg', fps=60)
 
