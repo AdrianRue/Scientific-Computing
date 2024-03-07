@@ -71,13 +71,13 @@ class DiffusionSimulation:
         """Visualize the 2D concentration domain at multiple time points, each in a separate plot."""
         for t in time_points:
             self.simulate_to_time(t)
-            fig, ax = plt.subplots(figsize=(6, 6))  # Create a new figure for each time point with square aspect ratio
-            
-            im = ax.imshow(np.flipud(self.Lattice.T), cmap='hot', extent=[0, 1, 0, 1], aspect='equal')  # Ensure square grid by setting aspect='equal'
+            fig, ax = plt.subplots(figsize=(6, 6))
+    
+            im = ax.imshow(np.flipud(self.Lattice.T), cmap='hot', extent=[0, 1, 0, 1], aspect='equal')
             ax.set_title(f'Concentration at t={t}')
             ax.set_xlabel('x')
             ax.set_ylabel('y')
-            fig.colorbar(im, ax=ax, fraction=0.046, pad=0.04)  # Add a colorbar to the plot
+            fig.colorbar(im, ax=ax, fraction=0.046, pad=0.04)  
             
             plt.show()
 
@@ -101,12 +101,11 @@ class DiffusionSimulation:
 
         ani = FuncAnimation(fig, update, frames=frames, init_func=init, blit=True, interval=interval)
         if save_path:
-            # Specify the writer for MP4 format
-            writer = FFMpegWriter(fps=30)  # Adjust fps as needed
-            ani.save(save_path, writer=writer)  # Save the animation as an MP4 file
+            writer = FFMpegWriter(fps=30)  
+            ani.save(save_path, writer=writer)
         plt.show()
 
-# Parameters and usage
+# Parameters 
 D = 1
 N = 50
 dt = 0.0001
@@ -114,5 +113,5 @@ time_points = [0.001, 0.01, 0.1, 1]
 
 simulation = DiffusionSimulation(D=D, N=N, dt=dt)
 # simulation.compare_with_analytical(time_points)
-#simulation.visualize_2d_concentration(time_points)
-simulation.animate_concentration(frames=200, interval=1, save_path='diffusion_animation3.mp4')
+# simulation.visualize_2d_concentration(time_points)
+# simulation.animate_concentration(frames=1000, interval=1, save_path='diffusion_animation1.mp4')
